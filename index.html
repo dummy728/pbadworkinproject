@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css"/>
+    <title>Sistem Peminjaman Kendaraan</title>
+</head>
+<body>
+    <header class="app-header">
+        <h1 id="pageTitle">Sistem Peminjaman Kendaraan</h1>
+        <p class="subtitle">Kelola data kendaraan secara dinamis DOM &amp; Javascript</p>
+    </header>
+    <main class="container">
+        <section class="vehicle-form">
+            <h2>Tambah Data Kendaraan</h2>
+            <form id="vehicleForm">
+                <div class="form-group">
+                    <label for="plateNumber">Nomor Polisi</label>
+                    <input type="text" id="plateNumber" placeholder="Contoh : BK 1234 AA"/>
+                </div>
+                <div class="form-group">
+                    <label for="brand">Merek</label>
+                    <input type="text" id="brand" placeholder="Contoh : Toyota"/>
+                </div>
+                <div class="form-group">
+                    <label for="model">Model</label>
+                    <input type="text" id="model" placeholder="Contoh : Avanza"/>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status">
+                        <option value="">Pilih Status</option>
+                        <option value="available">Available</option>
+                        <option value="borrowed">Borrowed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="officerNote">Catatan Petugas</label>
+                    <textarea id="officerNote" placeholder="Catatan Kondisi Kendaraan"></textarea>
+                </div>
+                <button type="submit">Tambah Kendaraan</button>
+            </form>
+        </section>
+        
+        <section class="vehicle-list">
+            <h2>Daftar Kendaraan</h2>
+            <div id="vehicleContainer">
+
+            </div>
+        </section>
+
+        <footer class="app-footer">
+            <p>&copy; 2026 Praktikum Web Dasar &amp; DOM</p>
+        </footer>
+    </main>
+
+    <script type="module" src="script.js"">
+        
+    </script>
+</body>
+</html>
