@@ -8,23 +8,25 @@
    Di JavaScript, "kontrak" digantikan oleh struktur object
    yang konsisten. Kita tetap jaga bentuknya sama.
 ------------------------------------------------ */
-const vehicles = [
-    {
-        id: 1,
-        plateNumber: "BK 1234 AA",
-        brand: "Toyota",
-        model: "Avanza",
-        status: "available"
-    },
-    {
-        id: 2,
-        plateNumber: "BK 5678 BB",
-        brand: "Toyota",
-        model: "Innova",
-        status: "borrowed",
-        officerNote: "Lecet di pintu kanan"
-    }
-];
+// const vehicles = [
+//     {
+//         id: 1,
+//         plateNumber: "BK 1234 AA",
+//         brand: "Toyota",
+//         model: "Avanza",
+//         status: "available"
+//     },
+//     {
+//         id: 2,
+//         plateNumber: "BK 5678 BB",
+//         brand: "Toyota",
+//         model: "Innova",
+//         status: "borrowed",
+//         officerNote: "Lecet di pintu kanan"
+//     }
+// ];
+
+let vehicles = [];
 
 /* ----------  Mengakses elemen DOM ---------- */
 const vehicleForm = document.getElementById("vehicleForm");
@@ -40,6 +42,7 @@ const vehicleContainer = document.getElementById("vehicleContainer");
 /* State untuk filter & search */
 let currentSearchQuery = "";
 let currentStatusFilter = "all";
+
 
 /* ----------  Fungsi Render (filter + search) ---------- */
 function renderVehicles() {
@@ -78,6 +81,26 @@ function renderVehicles() {
             deleteVehicle(id);
         });
     });
+}
+
+/* Fungsi Fetch Data */
+
+async function fetchVehicles() {
+    try {
+        const response = await fetch("http://localhost:3000/api/vehicles");
+
+        if (!response.ok) {
+            throw new Error("Gagal mengambil data kendaraan");
+        }
+
+        vehicles = await response.json();
+        console.log(vehicles)
+
+        renderVehicles();
+
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 /* ---------- Fungsi Hapus Data ---------- */
@@ -134,7 +157,8 @@ vehicleForm?.addEventListener("submit", (event) => {
     console.log("Total kendaraan:", vehicles.length);
 });
 
-renderVehicles();
+
+fetchVehicles();
 
 console.log("Aplikasi Sistem Peminjaman Kendaraan siap digunakan.");
 console.log("Data awal:", vehicles);
