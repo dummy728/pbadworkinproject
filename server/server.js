@@ -1,29 +1,24 @@
-const http = require("http");
-const vehicles = require("./data");
+const express = require('express');
+const cors = require('cors');
 
-const server = http.createServer((req, res) => {
+// Import routes (otomatis trigger koneksi DB saat require)
+const vehicleRoutes = require('./src/routes/vehicleRoutes');
 
-    if (req.method === "GET" && req.url === "/api/vehicles") {
+const app = express();
+const PORT = 3000;
 
-        res.writeHead(200, {
-            "Content-Type": "application/json",
-             "Access-Control-Allow-Origin": "*"
-        });
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-        res.end(JSON.stringify(vehicles));
-
-        return;
-    }
-
-    res.writeHead(404, {
-        "Content-Type": "application/json"
-    });
-
-    res.end(JSON.stringify({
-        message: "Endpoint tidak ditemukan"
-    }));
+// Test route
+app.get('/', (req, res) => {
+  res.json({ message: 'Server jalan 🚀' });
 });
 
-server.listen(3000, () => {
-    console.log("Server berjalan pada http://localhost:3000");
+// Routes
+app.use('/api/vehicles', vehicleRoutes);
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server: http://localhost:${PORT}`);
 });
