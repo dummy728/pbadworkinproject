@@ -32,4 +32,77 @@ const createVehicle = async (req, res) => {
   }
 };
 
-module.exports = { createVehicle };
+const viewAllVehicles = async(req,res) => {
+  try {
+    const rowData = await vehicleModel.viewAllVehicles();
+
+    res.status(200).json({
+      message: 'get Vehicle successfully',
+      data: rowData,
+    });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({
+      message: 'Server Error',
+      serverMessage: error.message,
+    });
+  }
+}
+
+const viewSingleVehicle = async(req,res) => {
+  try {
+    id = req.params.id
+    
+    const rowData = await vehicleModel.viewSingleVehicles(id);
+
+    res.status(200).json({
+      message: 'get single Vehicle successfully',
+      data : rowData
+    });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({
+      message: 'Server Error',
+      serverMessage: error.message,
+    });
+  }
+}
+
+const editVehicle = async(req,res) => {
+  try {
+    id = req.params.id
+    const vehicleInput = req.body;
+    const rowData = await vehicleModel.editVehicle(id, vehicleInput);
+
+    res.status(200).json({
+      message: 'edit Vehicle successfully',
+      data: rowData,
+    });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({
+      message: 'Server Error',
+      serverMessage: error.message,
+    });
+  }
+}
+
+const deleteVehicle = async(req,res) => {
+  try {
+    id = req.params.id
+    const result = await vehicleModel.deleteVehicle(id);
+
+    res.status(200).json({
+      message: `data with id: ${id} successfully deleted!`,
+      data: result,
+    });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({
+      message: 'Server Error',
+      serverMessage: error.message,
+    });
+  }
+}
+
+module.exports = { createVehicle, viewAllVehicles, viewSingleVehicle, editVehicle, deleteVehicle };
