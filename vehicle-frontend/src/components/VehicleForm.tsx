@@ -1,7 +1,7 @@
 // src/components/VehicleForm.tsx
 
 import { useState, type FormEvent } from "react";
-import type { Vehicle, VehicleStatus } from "../types/types";
+import type { Vehicle, VehicleStatus } from "../types/data_type";
 
 interface VehicleFormProps {
   onAdd: (vehicle: Omit<Vehicle, "id">) => void;
@@ -11,7 +11,7 @@ export default function VehicleForm({ onAdd }: VehicleFormProps) {
   const [plateNumber, setPlateNumber] = useState("");
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
-  const [status, setStatus] = useState<VehicleStatus>("Available");
+  const [status, setStatus] = useState<VehicleStatus>('available');
   const [notes, setNotes] = useState("");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -22,14 +22,14 @@ export default function VehicleForm({ onAdd }: VehicleFormProps) {
       brand: brand.trim(),
       model: model.trim(),
       status,
-      notes: notes.trim(),
+      officer_note: notes.trim(),
     });
 
     // Reset the form after adding a vehicle
     setPlateNumber("");
     setBrand("");
     setModel("");
-    setStatus("Available");
+    setStatus('available');
     setNotes("");
   }
 
@@ -78,8 +78,8 @@ export default function VehicleForm({ onAdd }: VehicleFormProps) {
             value={status}
             onChange={(e) => setStatus(e.target.value as VehicleStatus)}
           >
-            <option value="Available">Available</option>
-            <option value="Borrowed">Borrowed</option>
+            <option value="available">Available</option>
+            <option value="borrowed">Borrowed</option>
           </select>
         </div>
 
