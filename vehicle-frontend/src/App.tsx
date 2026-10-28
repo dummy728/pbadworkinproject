@@ -1,7 +1,8 @@
 import { useState } from "react";
 import VehicleForm from "./components/VehicleForm";
-import type { Vehicle } from "./types/types";
-import VehicleTable from "./components/VehicleTable";
+import type { Vehicle } from "./types/data_type";
+import './App.css'
+import VehicleList from "./components/VehicleList";
 
 export default function App() {
   const [vehicles, setvehicles] = useState<Vehicle[]>([]);
@@ -27,7 +28,7 @@ export default function App() {
         <p className="subtitle">Kelola data kendaraan secara dinamis DOM &amp; Javascript</p>
     </header>
     <VehicleForm onAdd={handleAddVehicle}/>
-    <VehicleTable vehicles={vehicles}/>
+    <VehicleList vehicles={vehicles}/>
     <footer className="app-footer">
             <p>&copy; 2026 Praktikum Web Dasar &amp; DOM</p>
         </footer>

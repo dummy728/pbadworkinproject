@@ -18,7 +18,7 @@ export default function VehicleForm({ onAdd }: VehicleFormProps) {
     event.preventDefault();
 
     onAdd({
-      plateNumber: plateNumber.trim(),
+      plate_number: plateNumber.trim(),
       brand: brand.trim(),
       model: model.trim(),
       status,
