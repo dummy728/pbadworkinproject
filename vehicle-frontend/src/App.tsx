@@ -1,37 +1,62 @@
-import { useState } from "react";
-import VehicleForm from "./components/VehicleForm";
-import type { Vehicle } from "./types/data_type";
-import './App.css'
-import VehicleList from "./components/VehicleList";
+import React from 'react'
+import {
+    BrowserRouter,
+    Link,
+    Route,
+    Routes
+} from 'react-router-dom'
 
-export default function App() {
-  const [vehicles, setvehicles] = useState<Vehicle[]>([]);
+import Home from './pages/home'
+import About from './pages/about'
+import VehicleManagement from './pages/vehicle_management'
+import Login from './pages/login'
 
-  function handleAddVehicle(
-    newVehicle: Omit<Vehicle, "id">
-  ){
-    const vehicle : Vehicle = {
-      ...newVehicle,
-      id: Date.now(),
-    };
+import ProtectedRoute from './components/ProtectedRoute'
+import { AuthProvider } from './context/AuthContext'
 
-    setvehicles((currentVehicles)=>[
-      ...currentVehicles,
-      vehicle,
-    ]);
-  }
+function App() {
+    return (
+        <AuthProvider>
+            <BrowserRouter>
 
-  return(
-    <main className="container">
-      <header className="app-header">
-        <h1 id="pageTitle">Sistem Peminjaman Kendaraan</h1>
-        <p className="subtitle">Kelola data kendaraan secara dinamis DOM &amp; Javascript</p>
-    </header>
-    <VehicleForm onAdd={handleAddVehicle}/>
-    <VehicleList vehicles={vehicles}/>
-    <footer className="app-footer">
-            <p>&copy; 2026 Praktikum Web Dasar &amp; DOM</p>
-        </footer>
-    </main>
-  )
+                <nav className="navbar">
+                    <Link to="/" className="navbar-brand">
+                        Vehicle Management
+                    </Link>
+
+                    <div className="navbar-links">
+                        <Link to="/home">Home</Link>
+                        <Link to="/about">About</Link>
+                    </div>
+                </nav>
+
+                <Routes>
+
+                    {/* Halaman publik */}
+                    <Route path="/login" element={<Login />} />
+
+                    {/* Halaman yang dilindungi */}
+                    <Route element={<ProtectedRoute />}>
+
+                        <Route path="/" element={<Home />} />
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/about" element={<About />} />
+                        <Route
+                            path="/vehicle_management"
+                            element={<VehicleManagement />}
+                        />
+
+                    </Route>
+
+                </Routes>
+
+                <footer className="app-footer">
+                    &copy; 2026 Sistem Peminjaman Kendaraan
+                </footer>
+
+            </BrowserRouter>
+        </AuthProvider>
+    )
 }
+
+export default App

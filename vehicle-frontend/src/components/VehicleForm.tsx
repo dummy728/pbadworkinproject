@@ -1,100 +1,155 @@
-// src/components/VehicleForm.tsx
-
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ChangeEvent } from "react";
 import type { Vehicle, VehicleStatus } from "../types/data_type";
+import axiosClient from "../api/axiosClient";
 
 interface VehicleFormProps {
-  onAdd: (vehicle: Omit<Vehicle, "id">) => void;
+    onAdd: (vehicle: Omit<Vehicle, "id">) => void;
 }
 
-export default function VehicleForm({ onAdd }: VehicleFormProps) {
-  const [plateNumber, setPlateNumber] = useState("");
-  const [brand, setBrand] = useState("");
-  const [model, setModel] = useState("");
-  const [status, setStatus] = useState<VehicleStatus>('available');
-  const [notes, setNotes] = useState("");
+interface VehicleFormData {
+    plateNumber: string;
+    brand: string;
+    model: string;
+    status: VehicleStatus;
+    officerNote: string;
+}
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    onAdd({
-      plate_number: plateNumber.trim(),
-      brand: brand.trim(),
-      model: model.trim(),
-      status,
-      officer_note: notes.trim(),
+const VehicleForm = () => {
+    const [formData, setFormData] = useState<VehicleFormData>({
+        plateNumber: "",
+        brand: "",
+        model: "",
+        status: "available",
+        officerNote: ""
     });
 
-    // Reset the form after adding a vehicle
-    setPlateNumber("");
-    setBrand("");
-    setModel("");
-    setStatus('available');
-    setNotes("");
-  }
+    const handleChange = (
+        event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    ) => {
+        const { name, value } = event.target;
 
-  return (
-    <section>
-      <h2>Tambah Data Kendaraan</h2>
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+    };
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="plateNumber">Nomor Polisi</label>
-          <input
-            id="plateNumber"
-            value={plateNumber}
-            onChange={(e) => setPlateNumber(e.target.value)}
-            placeholder="B 1234 ABC"
-            required
-          />
-        </div>
+    const handleSubmit = async (
+        event: FormEvent<HTMLFormElement>
+    ) => {
+        event.preventDefault();
 
-        <div>
-          <label htmlFor="brand">Merek</label>
-          <input
-            id="brand"
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
-            placeholder="Toyota"
-            required
-          />
-        </div>
+        try {
+            const newVehicle: Omit<Vehicle, "id"> = {
+                plateNumber: formData.plateNumber.trim(),
+                brand: formData.brand.trim(),
+                model: formData.model.trim(),
+                status: formData.status,
+                officerNote: formData.officerNote.trim() || null
+            };
 
-        <div>
-          <label htmlFor="model">Model</label>
-          <input
-            id="model"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            placeholder="Avanza"
-            required
-          />
-        </div>
+            const res = await axiosClient.post(
+                "/api/vehicles",
+                newVehicle
+            );
 
-        <div>
-          <label htmlFor="status">Status</label>
-          <select
-            id="status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value as VehicleStatus)}
-          >
-            <option value="available">Available</option>
-            <option value="borrowed">Borrowed</option>
-          </select>
-        </div>
+            console.log(res);
 
-        <div>
-          <label htmlFor="notes">Catatan Petugas</label>
-          <textarea
-            id="notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Catatan tambahan..."
-          />
-        </div>
+            setFormData({
+                plateNumber: "",
+                brand: "",
+                model: "",
+                status: "available",
+                officerNote: ""
+            });
 
-        <button type="submit">Tambah Kendaraan</button>
-      </form>
-    </section>
-  );
-}
+        } catch (error) {
+            alert("Terjadi kesalahan saat menyimpan data.");
+        }
+    };
+
+    return (
+        <section className="vehicle-form">
+            <h2>Tambah Data Kendaraan</h2>
+
+            <form onSubmit={handleSubmit} id="vehicleForm">
+                <div className="form-group">
+                    <label htmlFor="plateNumber">
+                        Nomor Polisi
+                    </label>
+                    <input
+                        type="text"
+                        id="plateNumber"
+                        name="plateNumber"
+                        value={formData.plateNumber}
+                        onChange={handleChange}
+                        placeholder="Contoh: BK 1234 AA"
+                        required
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="brand">Merek</label>
+                    <input
+                        type="text"
+                        id="brand"
+                        name="brand"
+                        value={formData.brand}
+                        onChange={handleChange}
+                        placeholder="Contoh: Toyota"
+                        required
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="model">Model</label>
+                    <input
+                        type="text"
+                        id="model"
+                        name="model"
+                        value={formData.model}
+                        onChange={handleChange}
+                        placeholder="Contoh: Avanza"
+                        required
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="status">Status</label>
+                    <select
+                        id="status"
+                        name="status"
+                        value={formData.status}
+                        onChange={handleChange}
+                    >
+                        <option value="available">
+                            Available
+                        </option>
+                        <option value="borrowed">
+                            Borrowed
+                        </option>
+                    </select>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="officerNote">
+                        Catatan Petugas
+                    </label>
+                    <textarea
+                        id="officerNote"
+                        name="officerNote"
+                        value={formData.officerNote}
+                        onChange={handleChange}
+                        placeholder="Catatan kondisi kendaraan"
+                    />
+                </div>
+
+                <button type="submit">
+                    Tambah Kendaraan
+                </button>
+            </form>
+        </section>
+    );
+};
+
+export default VehicleForm;

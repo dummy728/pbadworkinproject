@@ -587,6 +587,7 @@ body.login-page {
     width: 100%;
     max-width: 400px;
     margin: auto;
+    margin-top: 5em;
     padding: 0;
 }
 
