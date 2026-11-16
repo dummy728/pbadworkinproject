@@ -1,150 +1,112 @@
-const db = require('../config/database');
+const { dbRun, dbGet, dbAll } = require("../middleware/sqlite_helpers");
 
 /**
  * Insert kendaraan baru
  * @param {Object} body - { plateNumber, brand, model, status, officerNote }
  * @returns {Promise<Object>} - data yang baru dibuat
  */
-const createNewVehicle = (body) => {
-  return new Promise((resolve, reject) => {
-    try {
-      const query = `
-        INSERT INTO vehicles (plate_number, brand, model, status, officer_note)
-        VALUES (?, ?, ?, ?, ?)
-      `;
-      const values = [
-        body.plateNumber,
-        body.brand,
-        body.model,
-        body.status,
-        body.officerNote ?? null,
-      ];
+const createNewVehicle = async (body) => {
+  const query = `
+    INSERT INTO vehicles (plate_number, brand, model, status, officer_note)
+    VALUES (?, ?, ?, ?, ?)
+  `;
 
-      db.run(query, values, function (err) {
-        if (err) {
-          console.error("Something's not right!", err);
-          return reject(err);
-        }
+  const values = [
+    body.plateNumber,
+    body.brand,
+    body.model,
+    body.status,
+    body.officerNote ?? null,
+  ];
 
-        // this.lastID = id auto-increment yang baru dibuat
-        resolve({
-          id: this.lastID,
-          ...body,
-        });
-      });
-    } catch (error) {
-      console.error("Something's not right!", error);
-      reject(error);
-    }
-  });
+  const result = await dbRun(query, values);
+
+  return {
+    id: result.lastID,
+    ...body,
+  };
 };
 
-const viewAllVehicles = () => {
-  return new Promise((resolve, reject) => {
-    try {
-      const query = `SELECT * FROM vehicles`;
+/**
+ * Retrieve all vehicles
+ * @returns {Promise<Array>}
+ */
+const viewAllVehicles = async () => {
+  const query = `SELECT * FROM vehicles`;
 
-      db.all(query, [], (err, rows) => {
-        if (err) {
-          console.error("Something's not right!", err);
-          return reject(err);
-        }
-
-        resolve(rows);
-      })
-    } catch (error) {
-      console.error("Something's not right!", error);
-      reject(error);
-    }
-  })
-}
-
-const viewSingleVehicles = (id) => {
-  return new Promise((resolve, reject) => {
-    try {
-      const query = `SELECT * FROM vehicles WHERE vehicles.id=?`;
-
-      db.get(query, [id], (err, rows) => {
-        if (err) {
-          console.error("Something's not right!", err);
-          return reject(err);
-        }
-
-        resolve(rows);
-      })
-    } catch (error) {
-      console.error("Something's not right!", error);
-      reject(error);
-    }
-  })
-}
-
-
-const editVehicle = (id, body) => {
-  return new Promise((resolve, reject) => {
-    const query = `
-      UPDATE vehicles
-      SET plate_number = ?,
-          brand = ?,
-          model = ?,
-          status = ?,
-          officer_note = ?
-      WHERE id = ?
-    `;
-
-    const values = [
-      body.plateNumber,
-      body.brand,
-      body.model,
-      body.status,
-      body.officerNote ?? null,
-      id,
-    ];
-
-    db.run(query, values, function (err) {
-      if (err) {
-        return reject(err);
-      }
-
-      if (this.changes === 0) {
-        return resolve(null);
-      }
-    });
-
-    // Retrieve the updated vehicle
-      db.get(
-        `SELECT * FROM vehicles WHERE id = ?`,
-        [id],
-        (err, row) => {
-          if (err) {
-            return reject(err);
-          }
-
-          resolve(row);
-        }
-      );
-  });
+  return await dbAll(query);
 };
 
+/**
+ * Retrieve a single vehicle by ID
+ * @param {number} id
+ * @returns {Promise<Object|null>}
+ */
+const viewSingleVehicles = async (id) => {
+  const query = `SELECT * FROM vehicles WHERE id = ?`;
 
-const deleteVehicle = (id) => {
-  return new Promise((resolve, reject) => {
-    const query = `DELETE FROM vehicles WHERE id = ?`;
-
-    db.run(query, [id], function (err) {
-      if (err) {
-        console.error("Something's not right!", err);
-        return reject(err);
-      }
-
-      // Check whether a vehicle was deleted
-      if (this.changes === 0) {
-        return resolve(false);
-      }
-
-      resolve(true);
-    });
-  });
+  return await dbGet(query, [id]);
 };
 
-module.exports = { createNewVehicle, viewAllVehicles, viewSingleVehicles, editVehicle, deleteVehicle };
+/**
+ * Update an existing vehicle
+ * @param {number} id
+ * @param {Object} body
+ * @returns {Promise<Object|null>}
+ */
+const editVehicle = async (id, body) => {
+  const query = `
+    UPDATE vehicles
+    SET plate_number = ?,
+        brand = ?,
+        model = ?,
+        status = ?,
+        officer_note = ?
+    WHERE id = ?
+  `;
+
+  const values = [
+    body.plateNumber,
+    body.brand,
+    body.model,
+    body.status,
+    body.officerNote ?? null,
+    id,
+  ];
+
+  const result = await dbRun(query, values);
+
+  // Vehicle not found
+  if (result.changes === 0) {
+    return null;
+  }
+
+  // Retrieve the updated vehicle
+  const updatedVehicle = await dbGet(
+    `SELECT * FROM vehicles WHERE id = ?`,
+    [id]
+  );
+
+  return updatedVehicle;
+};
+
+/**
+ * Delete a vehicle
+ * @param {number} id
+ * @returns {Promise<boolean>}
+ */
+const deleteVehicle = async (id) => {
+  const query = `DELETE FROM vehicles WHERE id = ?`;
+
+  const result = await dbRun(query, [id]);
+
+  return result.changes > 0;
+};
+
+module.exports = {
+  createNewVehicle,
+  viewAllVehicles,
+  viewSingleVehicles,
+  editVehicle,
+  deleteVehicle,
+};

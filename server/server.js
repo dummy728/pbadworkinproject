@@ -1,23 +1,29 @@
 const express = require('express');
 const cors = require('cors');
-
-// Import routes (otomatis trigger koneksi DB saat require)
 const vehicleRoutes = require('./src/routes/vehicleRoutes');
 
-const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000
 
-app.use(cors());
+const app = express();
+
+// Middleware
+app.use(cors({
+  origin :'http://localhost:5173'
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Test route
+// Routes
 app.get('/', (req, res) => {
-  res.json({ message: 'Server jalan 🚀' });
+  res.json({ message: 'REST API SQLite berjalan 🚀' });
 });
 
-// Routes
 app.use('/api/vehicles', vehicleRoutes);
+
+// 404 Handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Endpoint tidak ditemukan' });
+});
 
 app.listen(PORT, () => {
   console.log(`🚀 Server: http://localhost:${PORT}`);

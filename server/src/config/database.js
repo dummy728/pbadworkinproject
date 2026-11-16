@@ -14,6 +14,14 @@ const db = new sqlite3.Database(dbPath, (err) => {
 // Buat tabel kendaraan jika belum ada
 db.serialize(() => {
   db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      user_id varchar(10) PRIMARY KEY,
+      user_name varchar(20) not null,
+	  email varchar(50) not null,
+      password TEXT not null,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS vehicles (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       plate_number TEXT NOT NULL,
@@ -22,7 +30,7 @@ db.serialize(() => {
       status TEXT NOT NULL,
       officer_note TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
+    );
   `);
 });
 
